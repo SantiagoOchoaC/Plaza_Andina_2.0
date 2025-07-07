@@ -1,0 +1,10 @@
+6 Santiago 1234 admin 
+5 Juana 1234 barra
+3 Lucas 1234 cocina
+4 Messi 1234 coctelero
+1 Juan 1234 jefemeseros
+8 Clarita 1234 mesero
+7 Ana Lopez 1234 mesero
+9 Steven 1234 mesero
+2 Maria 1234 mesero
+0 Pepe 1234 staff

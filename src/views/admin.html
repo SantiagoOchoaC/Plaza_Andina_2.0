@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="../css/styles1.css">
+    <title>Staff - Plaza Andina</title>
+</head>
+<body>
+    <!-- Header General -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo-container">
+                    🏪
+                </div>
+                <div class="header-title">
+                    <h1>Plaza Andina</h1>
+                    <p>Sistema de Gestión Restaurante</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">👮‍♂️</div>
+                    <div>
+                        <div style="font-weight: 600;">Staff</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Sesión Activa</div>
+                    </div>
+                </div>
+                <a href="../index.php" class="logout-btn">
+                    🚪 Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <div class="container">
+            <div class="dashboard-card">
+                <div class="role-header">
+                    <h1 class="role-title">👮‍♂️ Staff</h1>
+                    <p class="role-subtitle">Panel de Administración General</p>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">Aforo total</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">156</div>
+                        <div class="stat-label">Cantidad de trabajadores</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">8.4</div>
+                        <div class="stat-label">Promedio/Ingreso</div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🪑</div>
+                        <h3 class="feature-title">Consultar Disponibilidad Mesas</h3>
+                        <p class="feature-description">Estado de aforo actual</p>
+                        <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalMesas">Ver</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Reportes y Análisis</h3>
+                        <p class="feature-description">Visualizar estadísticas de ingreso y tiempo de espera</p>
+                        <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalReportes">Ver Reportes</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3 class="feature-title">Configuración</h3>
+                        <p class="feature-description">Ajustes generales del sistema y configuraciones</p>
+                        <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalConfiguracion">Configurar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Mesas -->
+    <div class="modal fade" id="modalMesas" tabindex="-1" aria-labelledby="modalMesasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-4" id="modalMesasLabel">🪑 Disponibilidad de Mesas</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0">Mesas Disponibles</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-success fs-6 p-2">Mesa 1</span>
+                                        <span class="badge bg-success fs-6 p-2">Mesa 3</span>
+                                        <span class="badge bg-success fs-6 p-2">Mesa 7</span>
+                                        <span class="badge bg-success fs-6 p-2">Mesa 12</span>
+                                        <span class="badge bg-success fs-6 p-2">Mesa 15</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h6 class="mb-0">Mesas Ocupadas</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-danger fs-6 p-2">Mesa 2</span>
+                                        <span class="badge bg-danger fs-6 p-2">Mesa 4</span>
+                                        <span class="badge bg-danger fs-6 p-2">Mesa 5</span>
+                                        <span class="badge bg-danger fs-6 p-2">Mesa 8</span>
+                                        <span class="badge bg-danger fs-6 p-2">Mesa 10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <strong>📈 Estado Actual:</strong> 19 de 24 mesas ocupadas (79% de ocupación)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary">Actualizar Estado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Reportes -->
+    <div class="modal fade" id="modalReportes" tabindex="-1" aria-labelledby="modalReportesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-4" id="modalReportesLabel">📊 Reportes y Análisis</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="card-title text-primary">$1,245,000</h2>
+                                    <p class="card-text">Ingresos Hoy</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="card-title text-success">87</h2>
+                                    <p class="card-text">Clientes Atendidos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="card-title text-warning">12 min</h2>
+                                    <p class="card-text">Tiempo Promedio Espera</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center">
+                                <div class="card-body">
+                                    <h2 class="card-title text-info">4.8</h2>
+                                    <p class="card-text">Calificación Promedio</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Resumen Semanal</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Ingresos</th>
+                                                    <th>Clientes</th>
+                                                    <th>Tiempo Espera Prom.</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Lunes</td>
+                                                    <td>$980,000</td>
+                                                    <td>65</td>
+                                                    <td>8 min</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Martes</td>
+                                                    <td>$1,120,000</td>
+                                                    <td>78</td>
+                                                    <td>10 min</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Miércoles</td>
+                                                    <td>$1,340,000</td>
+                                                    <td>92</td>
+                                                    <td>15 min</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Jueves</td>
+                                                    <td>$1,456,000</td>
+                                                    <td>98</td>
+                                                    <td>18 min</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Viernes</td>
+                                                    <td>$1,678,000</td>
+                                                    <td>112</td>
+                                                    <td>22 min</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success">Exportar PDF</button>
+                    <button type="button" class="btn btn-primary">Generar Reporte</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configuración -->
+    <div class="modal fade" id="modalConfiguracion" tabindex="-1" aria-labelledby="modalConfiguracionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-4" id="modalConfiguracionLabel">⚙️ Configuración del Sistema</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Configuración General</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="nombreRestaurante" class="form-label">Nombre del Restaurante</label>
+                                        <input type="text" class="form-control" id="nombreRestaurante" value="Plaza Andina">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="aforoMaximo" class="form-label">Aforo Máximo</label>
+                                        <input type="number" class="form-control" id="aforoMaximo" value="24">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="tiempoEsperaMax" class="form-label">Tiempo Máximo de Espera (min)</label>
+                                        <input type="number" class="form-control" id="tiempoEsperaMax" value="30">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Notificaciones</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="notifMesas" checked>
+                                        <label class="form-check-label" for="notifMesas">
+                                            Notificar disponibilidad de mesas
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="notifTiempo" checked>
+                                        <label class="form-check-label" for="notifTiempo">
+                                            Alertas de tiempo de espera
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="notifIngresos">
+                                        <label class="form-check-label" for="notifIngresos">
+                                            Reportes diarios de ingresos
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Gestión de Usuarios</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Usuario</th>
+                                                    <th>Rol</th>
+                                                    <th>Estado</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>admin@plazaandina.com</td>
+                                                    <td><span class="badge bg-primary">Admin</span></td>
+                                                    <td><span class="badge bg-success">Activo</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">Editar</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>staff@plazaandina.com</td>
+                                                    <td><span class="badge bg-secondary">Staff</span></td>
+                                                    <td><span class="badge bg-success">Activo</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-primary">Editar</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>cliente@email.com</td>
+                                                    <td><span class="badge bg-info">Cliente</span></td>
+                                                    <td><span class="badge bg-warning">Pendiente</span></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-outline-success">Activar</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+    <script>
+        // Auto-refresh cada 15 segundos para mantener actualizado el estado
+        setInterval(function() {
+            location.reload();
+        }, 15000); // 10000 ms = 10 segundos
+    </script>
+</html>

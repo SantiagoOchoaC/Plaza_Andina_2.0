@@ -1,0 +1,128 @@
+<?php
+// Conexón a la base de datos
+include_once 'conexion.php';
+
+// Iniciar la sesión, permitiendo el uso de variables de sesión
+session_start();
+
+// Desarrollar la lógica para el rol de coctelero a partir de aquí
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="../css/styles1.css">
+    <title>Barra - Plaza Andina</title>
+</head>
+<body>
+    <!-- Header General -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo-container">
+                    🏪
+                </div>
+                <div class="header-title">
+                    <h1>Plaza Andina</h1>
+                    <p>Sistema de Gestión Restaurante</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar">👨‍🍳</div>
+                    <div>
+                        <div style="font-weight: 600;">Cocteler@ <?php echo htmlspecialchars($_SESSION["coctelero_name"] ?? 'Usuario'); ?></div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Sesión Activa</div>
+                    </div>
+                </div>
+                <a href="../index.php" class="logout-btn">
+                    🚪 Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        
+        <div class="container">
+            <div class="dashboard-card">
+                <div class="role-header">
+                    <h1 class="role-title">🍺 Cóctelero</h1>
+                    <p class="role-subtitle">Servicio de mixes y cócteles</p>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Cócteles Pendientes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">24</div>
+                        <div class="stat-label">Bebidas Servidas</div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🍹</div>
+                        <h3 class="feature-title">Órdenes de Bebidas</h3>
+                        <p class="feature-description">Gestionar pedidos de cócteles de meseros y clientes directos</p>
+                        <a href="#" class="btn-dashboard">Ver Órdenes</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🍾</div>
+                        <h3 class="feature-title">Inventario de Licores</h3>
+                        <p class="feature-description">Control de stock de bebidas alcohólicas y no alcohólicas</p>
+                        <a href="#" class="btn-dashboard">Ver Stock</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🥃</div>
+                        <h3 class="feature-title">Cócteles Especiales</h3>
+                        <p class="feature-description">Preparar cócteles y bebidas especiales de la casa</p>
+                        <a href="#" class="btn-dashboard">Especiales</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">💳</div>
+                        <h3 class="feature-title">Ventas Directas</h3>
+                        <p class="feature-description">Procesar pagos de clientes que consumen en la barra</p>
+                        <a href="#" class="btn-dashboard">Caja Barra</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📋</div>
+                        <h3 class="feature-title">Carta de Bebidas</h3>
+                        <p class="feature-description">Consultar menú de bebidas y precios actualizados</p>
+                        <a href="#" class="btn-dashboard">Ver Carta</a>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🧊</div>
+                        <h3 class="feature-title">Suministros Barra</h3>
+                        <p class="feature-description">Gestionar hielo, mezcladores y otros insumos</p>
+                        <a href="#" class="btn-dashboard">Suministros</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+    <script>
+        // Auto-refresh cada 30 segundos para mantener la información actualizada
+        setInterval(function() {
+            // Solo hacer refresh si no hay modales abiertos
+            if (!document.querySelector('.modal.show')) {
+                location.reload();
+            }
+        }, 30000);
+    </script>
+</html>
