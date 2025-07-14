@@ -47,10 +47,10 @@ function obtenerMeseros() {
 function obtenerMesas() {
     global $con;
     
-    $sql = "SELECT m.id, m.estado, m.tipo, m.mesero, m.id_mesero, m.fecha_asignacion, 
+    $sql = "SELECT m.id, m.estado, m.tipo, m.mesero, m.fecha_asignacion, 
                     e.nombre AS nombre_mesero
                     FROM mesa m
-                    LEFT JOIN empleado e ON m.id_mesero = e.identificación
+                    LEFT JOIN empleado e ON m.mesero = e.identificación
                     ORDER BY m.id ASC";
     
     $result = $con->query($sql);
@@ -69,14 +69,14 @@ function liberarMesa($id_mesa) {
     $con->begin_transaction();
     
     try {
-        // Actualizar estado de la mesa
-        $sql = "UPDATE mesa SET estado = 'DISPONIBLE', mesero = NULL, id_mesero = NULL, fecha_asignacion = NULL WHERE id = ?";
+        // Actualizar estado de la mesa - ahora solo se actualiza 'mesero'
+        $sql = "UPDATE mesa SET estado = 'DISPONIBLE', mesero = NULL, fecha_asignacion = NULL WHERE id = ?";
         $stmt = $con->prepare($sql);
         $stmt->bind_param("i", $id_mesa);
         $stmt->execute();
         
         // Actualizar estado del pedido a terminado
-        $sql = "UPDATE pedido_general SET estado_general = 'terminado' WHERE id_mesa = ? AND estado_general = 'PAGADO'";
+        $sql = "UPDATE pedido_general SET estado_general = 'terminado' WHERE id_mesa = ? AND estado_general = 'pagado'";
         $stmt = $con->prepare($sql);
         $stmt->bind_param("i", $id_mesa);
         $stmt->execute();
@@ -104,10 +104,9 @@ function asignarMesa($id_mesa, $id_mesero) {
         $mesero = $result->fetch_assoc();
 
         if ($mesero) {
-            // Actualizar estado de la mesa
-            $sql = "UPDATE mesa SET estado = 'OCUPADA', mesero = ?, id_mesero = ?, fecha_asignacion = NOW() WHERE id = ?";
+            $sql = "UPDATE mesa SET estado = 'OCUPADA', mesero = ?, fecha_asignacion = NOW() WHERE id = ?";
             $stmt = $con->prepare($sql);
-            $stmt->bind_param("ssi", $mesero['nombre'], $id_mesero, $id_mesa);
+            $stmt->bind_param("si", $id_mesero, $id_mesa);
             $stmt->execute();
 
             // Marcar el pedido anterior como terminado

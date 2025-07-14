@@ -8,3 +8,4 @@
 9 Steven 1234 mesero
 2 Maria 1234 mesero
 0 Pepe 1234 staff
+  Rochi 1234 cajero 

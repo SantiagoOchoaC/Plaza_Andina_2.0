@@ -155,7 +155,7 @@ $estadoMesas = obtenerEstadoMesas();
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="feature-icon">🪑</div>
-                        <h3 class="feature-title">Consultar Disponibilidad Mesas</h3>
+                        <h3 class="feature-title">Consultar cantidad de Mesas</h3>
                         <p class="feature-description">Estado de aforo actual</p>
                         <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalMesas">Ver</a>
                     </div>
