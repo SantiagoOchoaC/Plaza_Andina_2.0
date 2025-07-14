@@ -1,0 +1,18 @@
+A continuación se presentarán una serie caracteristicas y detalles generales del funcionamiento del software de como se penso la solución del sprint 2:
+
+    ♦ Como rol (barra, cocina, coctel) en la bd voy a tener acceso a las tablas pedido general y ticket_X donde X es (barra,comida,licor) respectivamente
+    ♦ Funcionalida 1, donde como cada rol voy a poder ver el orden de atención de mis tickets, id_mesero asociado, los productos con su respectiva cantidad
+      y  detalle si lo tienen. donde podre marcarlo como atender el estado pasa a 'preparando'
+    ♦ Funcionalidad 2, voy a poder ver la lista de pedidos asignados y los pedidos en 'preparando' a estos le puedo colocar un nuevo estado que pasa a ser
+      'listo' en la respectiva seccion de pedido_general (estado_barra, estado_cocina, estado_licor)
+    ♦ Los estado de pedido_general seran pendiente , terminado (fin del proceso) y listo(solo cuando los estados de los tickets sean todo listo) --> 'Por 
+       simplicidad el pedido se entrega cuando este completo'.
+
+¿Qué falta?
+    ♦ Implementar la funcionalidad de Andres donde se debe crear una función que permita verificar sí los tickets asociados a un pedido están listos de ser
+     así cuando todos cumplan, esta misma función de modificar el estado general de pedido a listo y también de agregar la opción de marcar como pagado. 
+     las interfaces se pueden pensar de la siguiente manera: Un modal donde muestre los pedidos disponibles para entregar (listos) y un boton que permita
+     marcar como entregado.
+
+    ♦ Ademas se deben corregir posibles errores que salgan a partir de las pruebas que hagamos, pulir detalles esteticos (css, imagenes, logos) y configurar 
+     bien el pc donde se va a presentar para tener todo organizado previamente.   
