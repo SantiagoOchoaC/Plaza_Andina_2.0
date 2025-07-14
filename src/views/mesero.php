@@ -1193,7 +1193,7 @@ function formatearPrecio($precio) {
                                         <select class="form-select" id="mesaPedido" name="mesa_id" required onchange="validarFormulario()">
                                             <option value="">Seleccionar mesa...</option>
                                             <?php foreach($dataMesas['mesa'] as $mesa): ?>
-                                                <?php if ($mesa['estado'] === 'OCUPADA' || $mesa['estado'] === 'ATENDIENDO'): ?>
+                                                <?php if ($mesa['estado'] === 'OCUPADA'): ?>
                                                     <option value="<?php echo $mesa['id']; ?>">
                                                         Mesa #<?php echo $mesa['id']; ?> (<?php echo $mesa['estado'] === 'OCUPADA' ? 'Sin atender' : 'Atendiendo'; ?>)
                                                     </option>
