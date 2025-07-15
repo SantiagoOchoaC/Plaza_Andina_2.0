@@ -427,7 +427,7 @@ $stats_listos = obtenerEstadisticas('listo');
                 <div class="user-info">
                     <div class="user-avatar">👨‍🍳</div>
                     <div>
-                        <div style="font-weight: 600;">Chef de Cocina <?php echo htmlspecialchars($_SESSION["cocina_name"] ?? 'Usuario'); ?></div>
+                        <div style="font-weight: 600;">Jefe de Cocina <?php echo htmlspecialchars($_SESSION["cocina_name"] ?? 'Usuario'); ?></div>
                         <div style="font-size: 0.8rem; opacity: 0.8;">Sesión Activa</div>
                     </div>
                 </div>

@@ -405,7 +405,7 @@ $stats_listos = obtenerEstadisticas('listo');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../css/styles1.css">
-    <title>Coctelero - Plaza Andina</title>
+    <title>Barra - Plaza Andina</title>
     <style>
         .ticket-urgente {
             border-color: #dc3545 !important;
@@ -438,7 +438,7 @@ $stats_listos = obtenerEstadisticas('listo');
                 <div class="user-info">
                     <div class="user-avatar">👨‍🍳</div>
                     <div>
-                        <div style="font-weight: 600;">Jefe de Barra <?php echo htmlspecialchars($_SESSION["barra_name"] ?? 'Usuario'); ?></div>
+                        <div style="font-weight: 600;">Encargado de Barra <?php echo htmlspecialchars($_SESSION["barra_name"] ?? 'Usuario'); ?></div>
                         <div style="font-size: 0.8rem; opacity: 0.8;">Sesión Activa</div>
                     </div>
                 </div>

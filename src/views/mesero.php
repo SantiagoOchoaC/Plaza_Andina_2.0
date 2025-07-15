@@ -1078,9 +1078,13 @@ function formatearPrecio($precio) {
                                         </div>
                                     </div>
                                     <div class="card-footer text-center">
-                                        <button class="btn btn-success" onclick="cambiarEstado(<?php echo $mesa['id']; ?>, 'ATENDIENDO')">
+                                        <!--
+                                        <button class="btn btn-success"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#nuevoPedidoModal">
                                             👋 Atender
                                         </button>
+                                        -->
                                     </div>
                                 </div>
                             </div>
@@ -1408,7 +1412,6 @@ function formatearPrecio($precio) {
                                                                 $<?php echo number_format($producto['precio'], 0, ',', '.'); ?>
                                                             </span>
                                                             </div>
-
                                                             <!-- Control de cantidad -->
                                                             <div class="col-5 text-end">
                                                                 <div class="input-group input-group-sm justify-content-end">
@@ -1422,8 +1425,7 @@ function formatearPrecio($precio) {
                                                                         id="cantidad-<?php echo $producto['id_producto']; ?>"
                                                                         data-precio="<?php echo $producto['precio']; ?>"
                                                                         data-nombre="<?php echo htmlspecialchars($producto['nombre']); ?>"
-                                                                        onchange="actualizarPedido()">
-
+                                                                        onchange="manejarCambioInput('<?php echo $producto['id_producto']; ?>', this.value);">
                                                                     <button type="button" class="btn btn-outline-secondary btn-sm"
                                                                             onclick="cambiarCantidad('<?php echo $producto['id_producto']; ?>', 1)">+</button>
                                                                 </div>
@@ -1770,7 +1772,6 @@ function formatearPrecio($precio) {
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
-
         // Función para filtrar productos en tiempo real
         function filtrarProductos(termino) {
             const cards = document.querySelectorAll('.producto-card');
@@ -2025,13 +2026,36 @@ function formatearPrecio($precio) {
         };
         let totalPedido = 0;
 
+        // Actualiza todos los inputs de cantidad con el mismo idProducto en todas las pestañas
+        function sincronizarCantidad(idProducto, cantidad) {
+            // Actualizar todos los inputs con el mismo ID de producto
+            const inputs = document.querySelectorAll(`input[id^="cantidad-${idProducto}"]`);
+            inputs.forEach(input => {
+                input.value = cantidad;
+            });
+        }
+
         // Función para cambiar cantidad
         function cambiarCantidad(idProducto, cambio) {
+            // Busca el input principal
             const input = document.getElementById('cantidad-' + idProducto);
             let cantidad = parseInt(input.value) || 0;
             cantidad += cambio;
             if (cantidad < 0) cantidad = 0;
             input.value = cantidad;
+            
+            sincronizarCantidad(idProducto, cantidad);
+            actualizarPedido();
+        }
+
+        // Función para manejar el onchange del input
+        function manejarCambioInput(idProducto, nuevoValor) {
+            const cantidad = Math.max(0, parseInt(nuevoValor) || 0);
+            
+            // Sincronizar en todas las pestañas
+            sincronizarCantidad(idProducto, cantidad);
+            
+            // Actualizar pedido
             actualizarPedido();
         }
 
@@ -2052,6 +2076,9 @@ function formatearPrecio($precio) {
             };
             totalPedido = 0;
             
+            // Usar un Set para evitar duplicados
+            const productosUnicos = new Set();
+            
             // Obtener todos los inputs de cantidad
             const inputs = document.querySelectorAll('input[id^="cantidad-"]');
             
@@ -2059,33 +2086,39 @@ function formatearPrecio($precio) {
                 const cantidad = parseInt(input.value) || 0;
                 if (cantidad > 0) {
                     const idProducto = input.id.replace('cantidad-', '');
-                    const precio = parseFloat(input.dataset.precio);
-                    const nombre = input.dataset.nombre;
                     
-                    // Obtener categoría
-                    const productoCard = input.closest('.producto-pedido-card');
-                    const categoriaProducto = productoCard.dataset.categoria;
-                    const categoria = mapaCategorias[categoriaProducto] || categoriaProducto;
-                    
-                    // Obtener detalle si existe
-                    const detalleInput = document.getElementById(`detalle-input-${categoria}-${idProducto}`);
-                    const detalle = detalleInput ? detalleInput.value : '';
-                    
-                    const subtotal = cantidad * precio;
-                    
-                    // Agregar al pedido según categoría
-                    if (pedidoActual[categoria]) {
-                        pedidoActual[categoria][idProducto] = {
-                            cod: idProducto,
-                            cant: cantidad,
-                            detalle: detalle,
-                            precio: precio,
-                            nombre: nombre,
-                            subtotal: subtotal
-                        };
+                    // Solo procesar si no hemos procesado este producto antes
+                    if (!productosUnicos.has(idProducto)) {
+                        productosUnicos.add(idProducto);
+                        
+                        const precio = parseFloat(input.dataset.precio);
+                        const nombre = input.dataset.nombre;
+                        
+                        // Obtener categoría
+                        const productoCard = input.closest('.producto-pedido-card');
+                        const categoriaProducto = productoCard.dataset.categoria;
+                        const categoria = mapaCategorias[categoriaProducto] || categoriaProducto;
+                        
+                        // Obtener detalle si existe
+                        const detalleInput = document.getElementById(`detalle-input-${categoria}-${idProducto}`);
+                        const detalle = detalleInput ? detalleInput.value : '';
+                        
+                        const subtotal = cantidad * precio;
+                        
+                        // Agregar al pedido según categoría
+                        if (pedidoActual[categoria]) {
+                            pedidoActual[categoria][idProducto] = {
+                                cod: idProducto,
+                                cant: cantidad,
+                                detalle: detalle,
+                                precio: precio,
+                                nombre: nombre,
+                                subtotal: subtotal
+                            };
+                        }
+                        
+                        totalPedido += subtotal;
                     }
-                    
-                    totalPedido += subtotal;
                 }
             });
             
@@ -2322,10 +2355,10 @@ function formatearPrecio($precio) {
 
         // Listeners para actualizar el pedido
         document.getElementById('mesaPedido').addEventListener('change', validarFormulario);
-        document.getElementById('detallePedido').addEventListener('input', function() {
-            document.getElementById('detalleHidden').value = this.value;
-        });
-
+        //document.getElementById('detallePedido').addEventListener('input', function() {
+        //    document.getElementById('detalleHidden').value = this.value;
+        //});
+        
         // Auto-refresh cada 30 segundos para mantener la información actualizada
         setInterval(function() {
             // Solo hacer refresh si no hay modales abiertos
