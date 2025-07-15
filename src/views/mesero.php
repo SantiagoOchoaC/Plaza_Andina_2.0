@@ -376,6 +376,112 @@ function obtenerPedidos($id_mesero) {
 // Obtener pedidos del mesero actual
 $pedidos = obtenerPedidos($id_mesero);
 
+// --- FUNCIONALIDAD NUEVA: Notificaciones de tickets listos para entregar ---
+
+// Función para obtener notificaciones de tickets listos para el mesero actual
+function obtenerNotificacionesTicketsListos($con, $id_mesero) {
+    $notificaciones = [];
+    $query = "
+        SELECT pg.id as pedido_id, m.id as mesa_numero, pg.fecha_hora,
+            'barra' as dependencia, pg.estado_barra as estado_ticket
+        FROM pedido_general pg
+        INNER JOIN mesa m ON pg.id_mesa = m.id
+        WHERE pg.id_mesero = ? AND pg.estado_barra = 'listo'
+        UNION ALL
+        SELECT pg.id as pedido_id, m.id as mesa_numero, pg.fecha_hora,
+            'cocina' as dependencia, pg.estado_cocina as estado_ticket
+        FROM pedido_general pg
+        INNER JOIN mesa m ON pg.id_mesa = m.id
+        WHERE pg.id_mesero = ? AND pg.estado_cocina = 'listo'
+        UNION ALL
+        SELECT pg.id as pedido_id, m.id as mesa_numero, pg.fecha_hora,
+            'licor' as dependencia, pg.estado_licor as estado_ticket
+        FROM pedido_general pg
+        INNER JOIN mesa m ON pg.id_mesa = m.id
+        WHERE pg.id_mesero = ? AND pg.estado_licor = 'listo'
+        ORDER BY fecha_hora DESC
+    ";
+    $stmt = $con->prepare($query);
+    $stmt->bind_param("iii", $id_mesero, $id_mesero, $id_mesero);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    while ($row = $res->fetch_assoc()) {
+        $notificaciones[] = $row;
+    }
+    $stmt->close();
+    return $notificaciones;
+}
+
+// Procesar acción de entregar ticket
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion']) && $_POST['accion'] === 'entregar_ticket') {
+    $pedido_id = intval($_POST['pedido_id']);
+    $dependencia = $_POST['dependencia'];
+    $campo_estado = "estado_" . $dependencia;
+    $stmt = $con->prepare("UPDATE pedido_general SET $campo_estado = 'entregado' WHERE id = ?");
+    $stmt->bind_param("i", $pedido_id);
+    $stmt->execute();
+    $stmt->close();
+
+    // Verificar estados de todos los tickets para actualizar estado_general
+    $stmt_check = $con->prepare("SELECT estado_cocina, estado_barra, estado_licor FROM pedido_general WHERE id = ?");
+    $stmt_check->bind_param("i", $pedido_id);
+    $stmt_check->execute();
+    $res = $stmt_check->get_result();
+    $estados = $res->fetch_assoc();
+    $stmt_check->close();
+
+    // Filtrar solo los estados que no son NULL
+    $estados_validos = [];
+    foreach (['estado_cocina', 'estado_barra', 'estado_licor'] as $campo) {
+        if ($estados[$campo] !== null) {
+            $estados_validos[] = $estados[$campo];
+        }
+    }
+
+$estados_validos = array_filter($estados_validos); // Elimina posibles valores null, "", false
+
+// Eliminar duplicados para facilitar la lógica
+$estados_unicos = array_unique($estados_validos);
+
+// Caso 1: todos entregados
+if (count($estados_unicos) === 1 && $estados_unicos[0] === 'entregado') {
+    $stmt_general = $con->prepare("UPDATE pedido_general SET estado_general = 'entregado' WHERE id = ?");
+    $stmt_general->bind_param("i", $pedido_id);
+    $stmt_general->execute();
+    $stmt_general->close();
+
+// Caso 2: todos listos
+} elseif (count($estados_unicos) === 1 && $estados_unicos[0] === 'listo') {
+    $stmt_general = $con->prepare("UPDATE pedido_general SET estado_general = 'listo' WHERE id = ?");
+    $stmt_general->bind_param("i", $pedido_id);
+    $stmt_general->execute();
+    $stmt_general->close();
+
+// Caso 3: mezcla de listo y entregado (todos válidos en esos dos)
+} elseif (!array_diff($estados_unicos, ['listo', 'entregado'])) {
+    $stmt_general = $con->prepare("UPDATE pedido_general SET estado_general = 'listo' WHERE id = ?");
+    $stmt_general->bind_param("i", $pedido_id);
+    $stmt_general->execute();
+    $stmt_general->close();
+
+// Caso contrario: aún pendiente
+} else {
+    $stmt_general = $con->prepare("UPDATE pedido_general SET estado_general = 'pendiente' WHERE id = ?");
+    $stmt_general->bind_param("i", $pedido_id);
+    $stmt_general->execute();
+    $stmt_general->close();
+}
+
+
+    $_SESSION['mensaje'] = "Ticket entregado correctamente.";
+    $_SESSION['tipo_mensaje'] = "success";
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Obtener notificaciones para mostrar en la vista
+$notificacionesTickets = obtenerNotificacionesTicketsListos($con, $id_mesero);
+
 // Función para obtener el nombre del estado con ícono
 function getEstadoConIcono($estado) {
     switch ($estado) {
@@ -752,6 +858,17 @@ function formatearPrecio($precio) {
                         <h3 class="feature-title">Ver Pedidos</h3>
                         <p class="feature-description">Ver y gestionar mis pedidos activos</p>
                         <button class="btn-dashboard">Ver Pedidos</button>
+                    </div>
+
+                    <!-- Agregar botón para abrir el modal de notificaciones en el panel de funcionalidades -->
+                    <div class="feature-card" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                        <div class="feature-icon">🔔</div>
+                        <h3 class="feature-title">Historial de notificaciones</h3>
+                        <p class="feature-description">Tickets listos para entregar</p>
+                        <button class="btn-dashboard">Ver Notificaciones</button>
+                        <?php if (count($notificacionesTickets) > 0): ?>
+                            <span class="badge bg-danger position-absolute top-0 end-0"><?php echo count($notificacionesTickets); ?></span>
+                        <?php endif; ?>
                     </div>
             </div>
         </div>
@@ -1567,6 +1684,85 @@ function formatearPrecio($precio) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Notificaciones -->
+    <div class="modal fade" id="notificacionesModal" tabindex="-1" aria-labelledby="notificacionesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-4" id="notificacionesModalLabel">🔔 Historial de Notificaciones</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <?php if (empty($notificacionesTickets)): ?>
+                        <div class="text-center">
+                            <div class="alert alert-info">
+                                <h4>📋 Sin notificaciones</h4>
+                                <p>No tienes notificaciones de tickets listos en este momento.</p>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tablaNotificaciones">
+                                <thead>
+                                    <tr>
+                                        <th>ID Pedido</th>
+                                        <th>Mesa</th>
+                                        <th>Fecha y Hora</th>
+                                        <th>Dependencia</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach($notificacionesTickets as $notificacion): ?>
+                                    <tr>
+                                        <td>
+                                            <strong>#<?php echo htmlspecialchars($notificacion['pedido_id']); ?></strong>
+                                        </td>
+                                        <td>
+                                            <strong>🏠 Mesa <?php echo htmlspecialchars($notificacion['mesa_numero']); ?></strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">
+                                                <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($notificacion['fecha_hora']))); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<?php echo $notificacion['dependencia'] === 'barra' ? 'info' : ($notificacion['dependencia'] === 'cocina' ? 'success' : 'warning'); ?>">
+                                                <?php echo ucfirst(htmlspecialchars($notificacion['dependencia'])); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-<?php echo $notificacion['estado_ticket'] === 'listo' ? 'success' : 'danger'; ?>">
+                                                <?php echo ucfirst(htmlspecialchars($notificacion['estado_ticket'])); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="accion" value="entregar_ticket">
+                                                <input type="hidden" name="pedido_id" value="<?php echo $notificacion['pedido_id']; ?>">
+                                                <input type="hidden" name="dependencia" value="<?php echo $notificacion['dependencia']; ?>">
+                                                <button class="btn btn-sm btn-success" type="submit">
+                                                    🎉 Entregar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="location.reload()">
+                        🔄 Actualizar
+                    </button>
                 </div>
             </div>
         </div>

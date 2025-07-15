@@ -290,9 +290,10 @@ function cambiarEstadoPedidoBarra() {
             
             if ($stmt->execute()) {
                 // Si el pedido se marca como entregado, actualizar estado general si corresponde
-                if ($nuevo_estado == 'entregado') {
+                if (in_array($nuevo_estado, ['listo', 'entregado'])) {
                     actualizarEstadoGeneral($pedido_id);
                 }
+
                 
                 echo json_encode(['success' => true, 'message' => 'Estado de ticket actualizado correctamente']);
             } else {
@@ -307,28 +308,43 @@ function cambiarEstadoPedidoBarra() {
 // Función para actualizar estado general del pedido
 function actualizarEstadoGeneral($pedido_id) {
     global $conn;
-    
-    $sql = "SELECT estado_barra, estado_cocina, estado_licor FROM pedido_general WHERE id = ?";
+
+    $sql = "SELECT estado_cocina, estado_barra, estado_licor FROM pedido_general WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $pedido_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($row = $result->fetch_assoc()) {
-        $todos_entregados = true;
-        
-        // Verificar si todos los estados no nulos están en 'entregado'
-        if ($row['estado_barra'] && $row['estado_barra'] != 'entregado') $todos_entregados = false;
-        if ($row['estado_cocina'] && $row['estado_cocina'] != 'entregado') $todos_entregados = false;
-        if ($row['estado_licor'] && $row['estado_licor'] != 'entregado') $todos_entregados = false;
-        
-        if ($todos_entregados) {
-            $sql_update = "UPDATE pedido_general SET estado_general = 'completado' WHERE id = ?";
-            $stmt_update = $conn->prepare($sql_update);
-            $stmt_update->bind_param("i", $pedido_id);
-            $stmt_update->execute();
+        $estados = [];
+
+        foreach (['estado_cocina', 'estado_barra', 'estado_licor'] as $campo) {
+            if (!is_null($row[$campo])) {
+                $estados[] = $row[$campo];
+            }
         }
+
+        $estados = array_filter($estados); // Quitar nulos/vacíos
+        $unicos = array_unique($estados);
+
+        if (count($unicos) === 1 && $unicos[0] === 'entregado') {
+            $nuevo_estado = 'entregado';
+        } elseif (count($unicos) === 1 && $unicos[0] === 'listo') {
+            $nuevo_estado = 'listo';
+        } elseif (!array_diff($unicos, ['listo', 'entregado'])) {
+            $nuevo_estado = 'listo';
+        } else {
+            $nuevo_estado = 'pendiente';
+        }
+
+        $sql_update = "UPDATE pedido_general SET estado_general = ? WHERE id = ?";
+        $stmt_update = $conn->prepare($sql_update);
+        $stmt_update->bind_param("si", $nuevo_estado, $pedido_id);
+        $stmt_update->execute();
+        $stmt_update->close();
     }
+
+    $stmt->close();
 }
 
 // Función para obtener estadísticas por estado
