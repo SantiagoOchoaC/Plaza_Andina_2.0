@@ -847,7 +847,7 @@ function formatearPrecio($precio) {
                     </div>
 
                     <div class="feature-card" data-bs-toggle="modal" data-bs-target="#nuevoPedidoModal">
-                        <div class="feature-icon">📦</div>
+                        <div class="feature-icon">🍱</div>
                         <h3 class="feature-title">Nuevo Pedido</h3>
                         <p class="feature-description">Nueva Orden</p>
                         <button class="btn-dashboard">Tomar Pedidos</button>
@@ -1852,64 +1852,6 @@ function formatearPrecio($precio) {
             });
         }
 
-        // Función para ejecutar búsqueda avanzada
-        function ejecutarBusquedaAvanzada() {
-            const nombre = document.getElementById('busq_nombre').value.toLowerCase();
-            const codigo = document.getElementById('busq_codigo').value.toLowerCase();
-            const categoria = document.getElementById('busq_categoria').value.toLowerCase();
-            const precioMin = parseFloat(document.getElementById('busq_precio_min').value) || 0;
-            const precioMax = parseFloat(document.getElementById('busq_precio_max').value) || Infinity;
-            
-            const cards = document.querySelectorAll('.producto-card');
-            let productosVisibles = 0;
-            
-            cards.forEach(card => {
-                const nombreProducto = card.querySelector('.card-title').textContent.toLowerCase();
-                const codigoProducto = card.querySelector('.fw-bold').textContent.toLowerCase();
-                const categoriaProducto = card.querySelector('.badge').textContent.toLowerCase();
-                const precioTexto = card.querySelector('.fs-4').textContent.replace(/[^\d]/g, '');
-                const precioProducto = parseFloat(precioTexto) || 0;
-                
-                const coincideNombre = !nombre || nombreProducto.includes(nombre);
-                const coincideCodigo = !codigo || codigoProducto.includes(codigo);
-                const coincideCategoria = !categoria || categoriaProducto.includes(categoria);
-                const coincidePrecio = precioProducto >= precioMin && precioProducto <= precioMax;
-                
-                if (coincideNombre && coincideCodigo && coincideCategoria && coincidePrecio) {
-                    card.closest('.col-lg-4').style.display = 'block';
-                    productosVisibles++;
-                } else {
-                    card.closest('.col-lg-4').style.display = 'none';
-                }
-            });
-            
-            // Mostrar resultado
-            const contadorDiv = document.getElementById('contadorResultados');
-            const textoContador = document.getElementById('textoContador');
-            contadorDiv.style.display = 'block';
-            
-            if (productosVisibles === 0) {
-                textoContador.innerHTML = '❌ No se encontraron productos con los criterios especificados';
-                contadorDiv.className = 'alert alert-warning border';
-            } else {
-                textoContador.innerHTML = `✅ Encontrados <strong>${productosVisibles}</strong> productos con los criterios especificados`;
-                contadorDiv.className = 'alert alert-success border';
-            }
-            
-            // Cerrar modal de búsqueda avanzada
-            const busquedaModal = bootstrap.Modal.getInstance(document.getElementById('busquedaAvanzadaModal'));
-            busquedaModal.hide();
-        }
-
-        // Función para búsqueda rápida por categoría
-        function busquedaRapidaPorCategoria(categoria) {
-            const input = document.getElementById('buscarProducto');
-            input.value = categoria;
-            filtrarProductos(categoria);
-    }
-
-
-
         // Función para cambiar estado de mesa
         function cambiarEstado(idMesa, nuevoEstado) {
             let mensaje = '';
@@ -2286,6 +2228,86 @@ function formatearPrecio($precio) {
         }
 
         // Función para filtrar productos en el pedido
+        function filtrarProductos(termino) {
+            const cards = document.querySelectorAll('.producto-card');
+            const terminoLower = termino.toLowerCase().trim();
+            const contadorDiv = document.getElementById('contadorResultados');
+            const textoContador = document.getElementById('textoContador');
+            
+            let productosVisibles = 0;
+            let totalProductos = cards.length;
+            
+            // Si no hay término de búsqueda, mostrar todos
+            if (terminoLower === '') {
+                cards.forEach(card => {
+                    card.closest('.col-lg-4').style.display = 'block';
+                });
+                contadorDiv.style.display = 'none';
+                return;
+            }
+            
+            // Filtrar productos
+            cards.forEach(card => {
+                const nombre = card.querySelector('.card-title').textContent.toLowerCase();
+                const codigo = card.querySelector('.fw-bold').textContent.toLowerCase();
+                const categoria = card.querySelector('.badge').textContent.toLowerCase();
+                
+                // Buscar en nombre, código y categoría
+                const coincide = nombre.includes(terminoLower) ||
+                                codigo.includes(terminoLower) ||
+                                categoria.includes(terminoLower);
+                
+                if (coincide) {
+                    card.closest('.col-lg-4').style.display = 'block';
+                    productosVisibles++;
+                    
+                    // Resaltar el término encontrado
+                    resaltarTermino(card, terminoLower);
+                } else {
+                    card.closest('.col-lg-4').style.display = 'none';
+                }
+            });
+            
+            // Mostrar contador de resultados
+            contadorDiv.style.display = 'block';
+            if (productosVisibles === 0) {
+                textoContador.innerHTML = `❌ No se encontraron productos que coincidan con "<strong>${termino}</strong>"`;
+                contadorDiv.className = 'alert alert-warning border';
+            } else {
+                textoContador.innerHTML = `✅ Mostrando <strong>${productosVisibles}</strong> de <strong>${totalProductos}</strong> productos para "<strong>${termino}</strong>"`;
+                contadorDiv.className = 'alert alert-success border';
+            }
+        }
+
+        // Función para resaltar el término buscado
+        function resaltarTermino(card, termino) {
+            const elementos = card.querySelectorAll('.card-title, .fw-bold, .badge');
+            
+            elementos.forEach(elemento => {
+                const textoOriginal = elemento.textContent;
+                const regex = new RegExp(`(${termino})`, 'gi');
+                
+                if (regex.test(textoOriginal)) {
+                    elemento.innerHTML = textoOriginal.replace(regex, '<mark>$1</mark>');
+                }
+            });
+        }
+
+        // Función para limpiar la búsqueda
+        function limpiarBusqueda() {
+            const input = document.getElementById('buscarProducto');
+            input.value = '';
+            filtrarProductos('');
+            
+            // Limpiar cualquier resaltado
+            const marks = document.querySelectorAll('.producto-card mark');
+            marks.forEach(mark => {
+                const texto = mark.textContent;
+                mark.parentNode.replaceChild(document.createTextNode(texto), mark);
+            });
+        }
+
+        // Función para filtrar productos en el pedido (CORREGIDA)
         function filtrarProductosPedido(texto) {
             const productos = document.querySelectorAll('.producto-pedido-card');
             const contador = document.getElementById('contadorResultadosPedido');
@@ -2294,7 +2316,9 @@ function formatearPrecio($precio) {
             
             if (texto.trim() === '') {
                 productos.forEach(producto => {
-                    producto.style.display = 'block';
+                    // Buscar el contenedor padre (probablemente col-lg-4, col-md-6, etc.)
+                    const contenedorPadre = producto.closest('[class*="col-"]') || producto.closest('.card-container') || producto.parentElement;
+                    contenedorPadre.style.display = 'block';
                     productosVisibles++;
                 });
                 contador.style.display = 'none';
@@ -2306,13 +2330,16 @@ function formatearPrecio($precio) {
                     const categoria = producto.dataset.categoria;
                     const codigo = producto.dataset.codigo;
                     
+                    // Buscar el contenedor padre
+                    const contenedorPadre = producto.closest('[class*="col-"]') || producto.closest('.card-container') || producto.parentElement;
+                    
                     if (nombre.includes(textoBusqueda) || 
                         categoria.includes(textoBusqueda) || 
                         codigo.includes(textoBusqueda)) {
-                        producto.style.display = 'block';
+                        contenedorPadre.style.display = 'block';
                         productosVisibles++;
                     } else {
-                        producto.style.display = 'none';
+                        contenedorPadre.style.display = 'none';
                     }
                 });
                 
@@ -2366,6 +2393,7 @@ function formatearPrecio($precio) {
                 location.reload();
             }
         }, 30000);
+
     </script>
 </body>
 </html>

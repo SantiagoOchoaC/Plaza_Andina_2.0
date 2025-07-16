@@ -76,7 +76,7 @@ function liberarMesa($id_mesa) {
         $stmt->execute();
         
         // Actualizar estado del pedido a terminado
-        $sql = "UPDATE pedido_general SET estado_general = 'terminado' WHERE id_mesa = ? AND estado_general = 'pagado'";
+        $sql = "UPDATE pedido_general SET estado_general = 'terminado' WHERE id_mesa = ? AND estado_general = 'entregado'";
         $stmt = $con->prepare($sql);
         $stmt->bind_param("i", $id_mesa);
         $stmt->execute();
@@ -110,7 +110,7 @@ function asignarMesa($id_mesa, $id_mesero) {
             $stmt->execute();
 
             // Marcar el pedido anterior como terminado
-            $sql = "UPDATE pedido_general SET estado_general = 'terminado' WHERE id_mesa = ? AND estado_general = 'PAGADO'";
+            $sql = "UPDATE pedido_general SET estado_general = 'terminado' WHERE id_mesa = ? AND estado_general = 'entregado'";
             $stmt = $con->prepare($sql);
             $stmt->bind_param("i", $id_mesa);
             $stmt->execute();
@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Obtener datos para mostrar
-$pedidosPagados = obtenerPedidosPorEstado('pagado');
+$pedidosentregados = obtenerPedidosPorEstado('entregado');
 $pedidosPendientes = obtenerPedidosPorEstado('pendiente');
 $pedidosTerminados = obtenerPedidosPorEstado('terminado');
 $meseros = obtenerMeseros();
@@ -165,8 +165,8 @@ $mesasOcupadas = array_filter($mesas, function($mesa) {
 
 // Calcular estadísticas
 $totalPedidosPendientes = count($pedidosPendientes);
-$totalMesasLiberar = count($pedidosPagados);
-$totalSaldo = array_sum(array_column(array_merge($pedidosPagados, $pedidosTerminados), 'total'));
+$totalMesasLiberar = count($pedidosentregados);
+$totalSaldo = array_sum(array_column(array_merge($pedidosentregados, $pedidosTerminados), 'total'));
 ?>
 
 <!DOCTYPE html>
@@ -243,21 +243,15 @@ $totalSaldo = array_sum(array_column(array_merge($pedidosPagados, $pedidosTermin
                 <div class="feature-grid">
                     <div class="feature-card">
                         <div class="feature-icon">🧾</div>
-                        <h3 class="feature-title">Pedidos Pagados</h3>
-                        <p class="feature-description">Ver lista de pedidos que ya han sido pagados para liberar la mesa o asignar de nuevo al mesero</p>
-                        <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalPagados">Ver Pedidos</a>
+                        <h3 class="feature-title">Pedidos entregados</h3>
+                        <p class="feature-description">Ver lista de pedidos que ya han sido entregados para liberar la mesa o asignar de nuevo al mesero</p>
+                        <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalentregados">Ver Pedidos</a>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">⏳</div>
                         <h3 class="feature-title">Pedidos Pendientes</h3>
-                        <p class="feature-description">Ver estado actual de los pedidos no pagados</p>
+                        <p class="feature-description">Ver estado actual de los pedidos no entregados</p>
                         <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalPendientes">Ver Pendientes</a>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🪑</div>
-                        <h3 class="feature-title">Gestión de Mesas</h3>
-                        <p class="feature-description">Administrar asignación y liberación de mesas</p>
-                        <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#modalMesas">Ver Mesas</a>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon">📋</div>
@@ -270,12 +264,12 @@ $totalSaldo = array_sum(array_column(array_merge($pedidosPagados, $pedidosTermin
         </div>
     </div>
 
-    <!-- Modal Pedidos Pagados -->
-    <div class="modal fade" id="modalPagados" tabindex="-1" aria-labelledby="modalPagadosLabel" aria-hidden="true">
+    <!-- Modal Pedidos entregados -->
+    <div class="modal fade" id="modalentregados" tabindex="-1" aria-labelledby="modalentregadosLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-4" id="modalPagadosLabel">🧾 Pedidos Pagados</h1>
+                    <h1 class="modal-title fs-4" id="modalentregadosLabel">🧾 Pedidos entregados</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -291,7 +285,7 @@ $totalSaldo = array_sum(array_column(array_merge($pedidosPagados, $pedidosTermin
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($pedidosPagados as $pedido): ?>
+                            <?php foreach ($pedidosentregados as $pedido): ?>
                             <tr>
                                 <td><?php echo $pedido['id']; ?></td>
                                 <td>Mesa <?php echo $pedido['id_mesa']; ?></td>
@@ -325,7 +319,7 @@ $totalSaldo = array_sum(array_column(array_merge($pedidosPagados, $pedidosTermin
     </div>
 
     <!-- Modales para reasignar cada pedido -->
-    <?php foreach ($pedidosPagados as $pedido): ?>
+    <?php foreach ($pedidosentregados as $pedido): ?>
     <div class="modal fade" id="modalAsignar<?php echo $pedido['id']; ?>" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -398,110 +392,6 @@ $totalSaldo = array_sum(array_column(array_merge($pedidosPagados, $pedidosTermin
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="location.reload()">Actualizar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Gestión de Mesas -->
-    <div class="modal fade" id="modalMesas" tabindex="-1" aria-labelledby="modalGestionMesasLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4" id="modalGestionMesasLabel">🍽️ Gestión de Mesas</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Mesas Disponibles -->
-                        <div class="col-md-6">
-                            <h5 class="text-success">✅ Mesas Disponibles</h5>
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-sm table-striped">
-                                    <thead class="table-success">
-                                        <tr>
-                                            <th>Mesa</th>
-                                            <th>Tipo</th>
-                                            <th>Asignar a</th>
-                                            <th>Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach($mesasDisponibles as $mesa): ?>
-                                        <tr>
-                                            <td><strong>#<?php echo $mesa['id']; ?></strong></td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $mesa['tipo'] == 'NORMAL' ? 'primary' : 'warning'; ?>">
-                                                    <?php echo $mesa['tipo']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <form method="POST" style="display: inline;">
-                                                    <input type="hidden" name="accion" value="asignar">
-                                                    <input type="hidden" name="id_mesa" value="<?php echo $mesa['id']; ?>">
-                                                    <select name="mesero" class="form-select form-select-sm" required>
-                                                        <option value="">Seleccionar...</option>
-                                                        <?php foreach($meseros as $mesero): ?>
-                                                        <option value="<?php echo $mesero['identificación']; ?>">
-                                                            <?php echo htmlspecialchars($mesero['nombre']); ?>
-                                                        </option>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                            </td>
-                                            <td>
-                                                    <button type="submit" class="btn btn-success btn-sm">
-                                                        ➕ Asignar
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <!-- Mesas Ocupadas -->
-                        <div class="col-md-6">
-                            <h5 class="text-danger">🔴 Mesas Ocupadas</h5>
-                            <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
-                                <table class="table table-sm table-striped">
-                                    <thead class="table-danger">
-                                        <tr>
-                                            <th>Mesa</th>
-                                            <th>Tipo</th>
-                                            <th>Mesero</th>
-                                            <th>Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach($mesasOcupadas as $mesa): ?>
-                                        <tr>
-                                            <td><strong>#<?php echo $mesa['id']; ?></strong></td>
-                                            <td>
-                                                <span class="badge bg-<?php echo $mesa['tipo'] == 'NORMAL' ? 'primary' : 'warning'; ?>">
-                                                    <?php echo $mesa['tipo']; ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <strong><?php echo $mesa['nombre_mesero'] ? htmlspecialchars($mesa['nombre_mesero']) : 'Sin asignar'; ?></strong>
-                                            </td>
-                                            <td>
-                                                <form method="POST" style="display: inline;">
-                                                    <input type="hidden" name="accion" value="liberar">
-                                                    <input type="hidden" name="id_mesa" value="<?php echo $mesa['id']; ?>">
-                                                    <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('¿Liberar esta mesa?')">
-                                                        ➖ Liberar
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

@@ -405,7 +405,7 @@ $stats_listos = obtenerEstadisticas('listo');
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../css/styles1.css">
-    <title>Barra - Plaza Andina</title>
+    <title>Coctelería - Plaza Andina</title>
 </head>
 <body>
     <!-- Header General -->
@@ -447,7 +447,7 @@ $stats_listos = obtenerEstadisticas('listo');
                 <div class="quick-stats">
                     <div class="stat-card">
                         <div class="stat-number"><?php echo $stats_pendientes; ?></div>
-                        <div class="stat-label">Pedidos Pendientes</div>
+                        <div class="stat-label">Tickets Pendientes</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number"><?php echo $stats_preparando; ?></div>
@@ -455,7 +455,7 @@ $stats_listos = obtenerEstadisticas('listo');
                     </div>
                     <div class="stat-card">
                         <div class="stat-number"><?php echo $stats_listos; ?></div>
-                        <div class="stat-label">Listos para Entregar</div>
+                        <div class="stat-label">Tickets Atendidos</div>
                     </div>
                 </div>
 
@@ -463,27 +463,27 @@ $stats_listos = obtenerEstadisticas('listo');
                     <div class="feature-card">
                         <div class="feature-icon">⏳</div>
                         <h3 class="feature-title">Orden de Atención</h3>
-                        <p class="feature-description">Atender pedidos pendientes</p>
+                        <p class="feature-description">Atender mis tickets pendientes</p>
                         <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#ordenAtencionModal">
-                            Atender Pedidos (<?php echo $stats_pendientes; ?>)
+                            Atender Tickets
                         </a>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🔄</div>
                         <h3 class="feature-title">Marcar Pedidos</h3>
-                        <p class="feature-description">Pedidos en preparación a listos</p>
+                        <p class="feature-description">Tickets en preparación a listos</p>
                         <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#marcarPedidosModal">
-                            Marcar Listos (<?php echo $stats_preparando; ?>)
+                            Marcar Listos
                         </a>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">✅</div>
                         <h3 class="feature-title">Ver Historial</h3>
-                        <p class="feature-description">Pedidos listos para entregar</p>
+                        <p class="feature-description">Tickets con estado listo</p>
                         <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#historialModal">
-                            Ver Listos (<?php echo $stats_listos; ?>)
+                            Ver Listos
                         </a>
                     </div>
                 </div>
@@ -737,19 +737,6 @@ $stats_listos = obtenerEstadisticas('listo');
             if (statCards[0]) statCards[0].textContent = pendientes;
             if (statCards[1]) statCards[1].textContent = preparando;
             if (statCards[2]) statCards[2].textContent = listos;
-            
-            // Actualizar contadores en los botones
-            const buttons = document.querySelectorAll('.btn-dashboard');
-            buttons.forEach(button => {
-                const text = button.textContent;
-                if (text.includes('Atender Pedidos')) {
-                    button.textContent = `Atender Pedidos (${pendientes})`;
-                } else if (text.includes('Marcar Listos')) {
-                    button.textContent = `Marcar Listos (${preparando})`;
-                } else if (text.includes('Ver Listos')) {
-                    button.textContent = `Ver Listos (${listos})`;
-                }
-            });
         })
         .catch(error => {
             console.error('Error actualizando estadísticas:', error);
@@ -791,25 +778,6 @@ $stats_listos = obtenerEstadisticas('listo');
     function manejarErrorRed(error) {
         console.error('Error de red:', error);
         mostrarAlerta('error', 'Error de conexión. Verifique su conexión a internet.');
-    }
-
-    // Función para sonido de notificación (opcional)
-    function reproducirSonidoNotificacion() {
-        // Crear un sonido simple usando Web Audio API
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.5);
     }
 
     // Event listeners cuando el DOM esté cargado
