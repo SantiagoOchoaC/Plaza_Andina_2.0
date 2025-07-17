@@ -861,14 +861,17 @@ function formatearPrecio($precio) {
                     </div>
 
                     <!-- Agregar botón para abrir el modal de notificaciones en el panel de funcionalidades -->
-                    <div class="feature-card" data-bs-toggle="modal" data-bs-target="#notificacionesModal">
+                    <div class="feature-card" data-bs-toggle="modal" data-bs-target="#notificacionesModal" style="position: relative;">
                         <div class="feature-icon">🔔</div>
                         <h3 class="feature-title">Historial de notificaciones</h3>
                         <p class="feature-description">Tickets listos para entregar</p>
                         <button class="btn-dashboard">Ver Notificaciones</button>
                         <?php if (count($notificacionesTickets) > 0): ?>
-                            <span class="badge bg-danger position-absolute top-0 end-0"><?php echo count($notificacionesTickets); ?></span>
-                        <?php endif; ?>
+        <span class="badge bg-danger"
+              style="position: absolute; top: 10px; right: 10px; z-index: 2; font-size: 1rem;">
+            <?php echo count($notificacionesTickets); ?>
+        </span>
+    <?php endif; ?>
                     </div>
             </div>
         </div>
@@ -1664,6 +1667,54 @@ function formatearPrecio($precio) {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Filtros para notificaciones -->
+                    <div class="row mb-3">
+                        <div class="col-md-4 mb-2">
+                            <input type="text" id="filtroNotiMesa" class="form-control mb-1" placeholder="Filtrar por mesa...">
+                            <select id="selectNotiMesa" class="form-select form-select-sm">
+                                <option value="">Todas las mesas</option>
+                                <?php
+                                $mesas_unicas = [];
+                                foreach ($notificacionesTickets as $n) {
+                                    $mesas_unicas[$n['mesa_numero']] = true;
+                                }
+                                foreach (array_keys($mesas_unicas) as $mesa) {
+                                    echo "<option value=\"" . htmlspecialchars($mesa) . "\">Mesa $mesa</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <input type="text" id="filtroNotiDependencia" class="form-control mb-1" placeholder="Filtrar por dependencia...">
+                            <select id="selectNotiDependencia" class="form-select form-select-sm">
+                                <option value="">Todas las dependencias</option>
+                                <?php
+                                $deps = [];
+                                foreach ($notificacionesTickets as $n) {
+                                    $deps[strtolower($n['dependencia'])] = true;
+                                }
+                                foreach (array_keys($deps) as $dep) {
+                                    echo "<option value=\"" . htmlspecialchars($dep) . "\">" . ucfirst($dep) . "</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <input type="text" id="filtroNotiPedido" class="form-control mb-1" placeholder="Filtrar por ID pedido...">
+                            <select id="selectNotiPedido" class="form-select form-select-sm">
+                                <option value="">Todos los pedidos</option>
+                                <?php
+                                $pedidos_unicos = [];
+                                foreach ($notificacionesTickets as $n) {
+                                    $pedidos_unicos[$n['pedido_id']] = true;
+                                }
+                                foreach (array_keys($pedidos_unicos) as $pid) {
+                                    echo "<option value=\"" . htmlspecialchars($pid) . "\">Pedido #$pid</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
                     <?php if (empty($notificacionesTickets)): ?>
                         <div class="text-center">
                             <div class="alert alert-info">
@@ -1687,18 +1738,14 @@ function formatearPrecio($precio) {
                                 <tbody>
                                     <?php foreach($notificacionesTickets as $notificacion): ?>
                                     <tr>
-                                        <td>
-                                            <strong>#<?php echo htmlspecialchars($notificacion['pedido_id']); ?></strong>
-                                        </td>
-                                        <td>
-                                            <strong>🏠 Mesa <?php echo htmlspecialchars($notificacion['mesa_numero']); ?></strong>
-                                        </td>
+                                        <td class="noti-pedido"><?php echo htmlspecialchars($notificacion['pedido_id']); ?></td>
+                                        <td class="noti-mesa"><?php echo htmlspecialchars($notificacion['mesa_numero']); ?></td>
                                         <td>
                                             <span class="badge bg-light text-dark">
                                                 <?php echo htmlspecialchars(date('d/m/Y H:i', strtotime($notificacion['fecha_hora']))); ?>
                                             </span>
                                         </td>
-                                        <td>
+                                        <td class="noti-dependencia">
                                             <span class="badge bg-<?php echo $notificacion['dependencia'] === 'barra' ? 'info' : ($notificacion['dependencia'] === 'cocina' ? 'success' : 'warning'); ?>">
                                                 <?php echo ucfirst(htmlspecialchars($notificacion['dependencia'])); ?>
                                             </span>
@@ -1709,7 +1756,7 @@ function formatearPrecio($precio) {
                                             </span>
                                         </td>
                                         <td>
-                                            <form method="POST" style="display:inline;">
+                                            <form method="POST" style="display:inline;" onsubmit="return confirmarEntrega(this);">
                                                 <input type="hidden" name="accion" value="entregar_ticket">
                                                 <input type="hidden" name="pedido_id" value="<?php echo $notificacion['pedido_id']; ?>">
                                                 <input type="hidden" name="dependencia" value="<?php echo $notificacion['dependencia']; ?>">
@@ -2346,9 +2393,7 @@ function formatearPrecio($precio) {
 
         // Listeners para actualizar el pedido
         document.getElementById('mesaPedido').addEventListener('change', validarFormulario);
-        //document.getElementById('detallePedido').addEventListener('input', function() {
-        //    document.getElementById('detalleHidden').value = this.value;
-        //});
+        //document.getElementById('meseroAsignado').addEventListener('change', validarFormulario);
         
         // Auto-refresh cada 30 segundos para mantener la información actualizada
         setInterval(function() {
@@ -2358,6 +2403,57 @@ function formatearPrecio($precio) {
             }
         }, 30000);
 
+        // Filtros para la tabla de notificaciones (manual y select)
+        function filtrarNotificaciones() {
+            const filtroMesa = document.getElementById('filtroNotiMesa').value.trim().toLowerCase();
+            const filtroDependencia = document.getElementById('filtroNotiDependencia').value.trim().toLowerCase();
+            const filtroPedido = document.getElementById('filtroNotiPedido').value.trim().toLowerCase();
+
+            const selectMesa = document.getElementById('selectNotiMesa').value.trim().toLowerCase();
+            const selectDependencia = document.getElementById('selectNotiDependencia').value.trim().toLowerCase();
+            const selectPedido = document.getElementById('selectNotiPedido').value.trim().toLowerCase();
+
+            const filas = document.querySelectorAll('#tablaNotificaciones tbody tr');
+            filas.forEach(fila => {
+                const mesa = fila.querySelector('.noti-mesa')?.textContent.trim().toLowerCase() || '';
+                const dependencia = fila.querySelector('.noti-dependencia')?.textContent.trim().toLowerCase() || '';
+                const pedido = fila.querySelector('.noti-pedido')?.textContent.trim().toLowerCase() || '';
+
+                let mostrar = true;
+                // Filtro manual (input)
+                if (filtroMesa && !mesa.includes(filtroMesa)) mostrar = false;
+                if (filtroDependencia && !dependencia.includes(filtroDependencia)) mostrar = false;
+                if (filtroPedido && !pedido.includes(filtroPedido)) mostrar = false;
+                // Filtro select (desplegable)
+                if (selectMesa && mesa !== selectMesa) mostrar = false;
+                if (selectDependencia && dependencia !== selectDependencia) mostrar = false;
+                if (selectPedido && pedido !== selectPedido) mostrar = false;
+
+                fila.style.display = mostrar ? '' : 'none';
+            });
+        }
+
+        document.getElementById('filtroNotiMesa')?.addEventListener('input', filtrarNotificaciones);
+        document.getElementById('filtroNotiDependencia')?.addEventListener('input', filtrarNotificaciones);
+        document.getElementById('filtroNotiPedido')?.addEventListener('input', filtrarNotificaciones);
+        document.getElementById('selectNotiMesa')?.addEventListener('change', function() {
+            // Limpiar input manual al usar select
+            document.getElementById('filtroNotiMesa').value = '';
+            filtrarNotificaciones();
+        });
+        document.getElementById('selectNotiDependencia')?.addEventListener('change', function() {
+            document.getElementById('filtroNotiDependencia').value = '';
+            filtrarNotificaciones();
+        });
+        document.getElementById('selectNotiPedido')?.addEventListener('change', function() {
+            document.getElementById('filtroNotiPedido').value = '';
+            filtrarNotificaciones();
+        });
+
+        // Confirmación al entregar ticket
+        function confirmarEntrega(form) {
+            return confirm('¿Estás seguro de marcar este ticket como entregado?');
+        }
     </script>
 </body>
 </html>
