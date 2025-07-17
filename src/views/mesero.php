@@ -487,11 +487,11 @@ function getEstadoConIcono($estado) {
     switch ($estado) {
         case 'pendiente':
             return '⏳ Pendiente';
-        case 'servir':
+        case 'listo':
             return '👨‍🍳 Listo para servir';
         case 'entregado':
             return '✅ Entregado';
-        case 'pagado':
+        case 'terminado':
             return '💲 Pagado';
         default:
             return $estado;
@@ -503,14 +503,14 @@ function getClaseEstado($estado) {
     switch ($estado) {
         case 'pendiente':
             return 'warning';
-        case 'servir':
+        case 'listo':
             return 'success';
         case 'entregado':
             return 'primary';
-        case 'pagado':
+        case 'terminado':
             return 'secondary';
         default:
-            return 'light';
+            return 'secondary';
     }
 }
 
@@ -856,7 +856,7 @@ function formatearPrecio($precio) {
                     <div class="feature-card" data-bs-toggle="modal" data-bs-target="#pedidosActivosModal">
                         <div class="feature-icon">📦</div>
                         <h3 class="feature-title">Ver Pedidos</h3>
-                        <p class="feature-description">Ver y gestionar mis pedidos activos</p>
+                        <p class="feature-description">Ver estado de mis pedidos</p>
                         <button class="btn-dashboard">Ver Pedidos</button>
                     </div>
 
@@ -961,9 +961,9 @@ function formatearPrecio($precio) {
                                             </td>
                                             <td>
                                                 <?php if ($mesa['estado'] == 'OCUPADA'): ?>
-                                                    <button class="btn btn-sm btn-success" onclick="cambiarEstado(<?php echo $mesa['id']; ?>, 'ATENDIENDO')">
-                                                        👋 Atender
-                                                    </button>
+                                                    <span class="badge bg-danger">
+                                                        👋 Requiere atención
+                                                    </span>
                                                 <?php elseif ($mesa['estado'] == 'ATENDIENDO'): ?>
                                                     <span class="badge bg-primary">✅ En atención</span>
                                                 <?php endif; ?>
@@ -1050,7 +1050,7 @@ function formatearPrecio($precio) {
                                 <div class="card h-100 border-<?php echo $mesa['prioridad_class']; ?>">
                                     <div class="card-header bg-<?php echo $mesa['prioridad_class']; ?> text-white">
                                         <h5 class="card-title mb-0">
-                                            <span class="badge bg-light text-dark me-2">#<?php echo $index + 1; ?></span>
+                                            <span class="badge bg-warning">#<?php echo $index + 1; ?></span>
                                             🏠 Mesa <?php echo htmlspecialchars($mesa['id']); ?>
                                         </h5>
                                     </div>
@@ -1600,80 +1600,44 @@ function formatearPrecio($precio) {
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-4" id="pedidosActivosModalLabel">📋 Pedidos Activos</h1>
+                    <h1 class="modal-title fs-4" id="pedidosActivosModalLabel">📋 Estado de los Pedidos</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0">📋 Gestión de Pedidos</h5>
-                        </div>
                         <div class="card-body">
                             <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                                 <table class="table table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Pedido</th>
-                                            <th>Mesa</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
+                                            <th class="text-left" style="width:33%;">Pedido</th>
+                                            <th class="text-left" style="width:33%;">Mesa</th>
+                                            <th class="text-left" style="width:33%;">Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php foreach($pedidos as $pedido): ?>
-                                            <?php if ($pedido['estado_general'] !== 'pagado'): ?>
+                                            <?php if ($pedido['estado_general'] !== 'terminado'): ?>
                                                 <tr>
-                                                    <td>
+                                                    <td class="text-left" style="width:33%;">
                                                         <strong>#<?php echo $pedido['id']; ?></strong>
                                                         <small class="d-block text-muted">
                                                             <?php echo htmlspecialchars(substr($pedido['fecha_hora'], 0, 16)); ?>
                                                         </small>
                                                     </td>
-                                                    <td>#<?php echo $pedido['mesa_numero']; ?></td>
-                                                    <td>
+                                                    <td class="text-left" style="width:33%;">#<?php echo $pedido['mesa_numero']; ?></td>
+                                                    <td class="text-left" style="width:33%;">
                                                         <span class="badge bg-<?php echo getClaseEstado($pedido['estado_general']); ?>">
                                                             <?php echo getEstadoConIcono($pedido['estado_general']); ?>
                                                         </span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="btn-group btn-group-sm">
-                                                            <?php if ($pedido['estado_general'] === 'pendiente'): ?>
-                                                                <form method="POST" style="display: inline;">
-                                                                    <input type="hidden" name="accion" value="cambiar_estado_pedido">
-                                                                    <input type="hidden" name="pedido_id" value="<?php echo $pedido['id']; ?>">
-                                                                    <input type="hidden" name="nuevo_estado" value="servir">
-                                                                    <button type="submit" class="btn btn-outline-success btn-sm">
-                                                                        🍽️ Listo
-                                                                    </button>
-                                                                </form>
-                                                            <?php elseif ($pedido['estado_general'] === 'servir'): ?>
-                                                                <form method="POST" style="display: inline;">
-                                                                    <input type="hidden" name="accion" value="cambiar_estado_pedido">
-                                                                    <input type="hidden" name="pedido_id" value="<?php echo $pedido['id']; ?>">
-                                                                    <input type="hidden" name="nuevo_estado" value="entregado">
-                                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
-                                                                        ✅ Entregar
-                                                                    </button>
-                                                                </form>
-                                                            <?php elseif ($pedido['estado_general'] === 'entregado'): ?>
-                                                                <form method="POST" style="display: inline;">
-                                                                    <input type="hidden" name="accion" value="cambiar_estado_pedido">
-                                                                    <input type="hidden" name="pedido_id" value="<?php echo $pedido['id']; ?>">
-                                                                    <input type="hidden" name="nuevo_estado" value="pagado">
-                                                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
-                                                                        💲 Cobrar
-                                                                    </button>
-                                                                </form>
-                                                            <?php endif; ?>
-                                                        </div>
                                                     </td>
                                                 </tr>
                                             <?php endif; ?>
                                         <?php endforeach; ?>
                                         
-                                        <?php if (count(array_filter($pedidos, function($p) { return $p['estado_general'] !== 'pagado'; })) === 0): ?>
+                                        <?php if (count(array_filter($pedidos, function($p) { return $p['estado_general'] !== 'terminado'; })) === 0): ?>
                                             <tr>
-                                                <td colspan="4" class="text-center text-muted">
+                                                <td colspan="3" class="text-left text-muted">
                                                     No hay pedidos activos
                                                 </td>
                                             </tr>
@@ -1685,7 +1649,7 @@ function formatearPrecio($precio) {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>

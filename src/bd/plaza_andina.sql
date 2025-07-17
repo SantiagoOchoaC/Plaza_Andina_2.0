@@ -213,7 +213,6 @@ CREATE TABLE `producto` (
 --
 
 INSERT INTO `producto` (`id_producto`, `nombre`, `tipo`, `precio`) VALUES
-(1001, 'Aguardiente 260ml', 'licor', 17000),
 (1002, 'Coctel Daiquiri lata 295ml', 'coctel', 9900),
 (1003, 'Coctel Maracuyá 250ml', 'coctel', 5850),
 (1004, 'Coctel Gin Tonic 280ml', 'coctel', 24900),
@@ -223,6 +222,7 @@ INSERT INTO `producto` (`id_producto`, `nombre`, `tipo`, `precio`) VALUES
 (1008, 'Cóctel JonRon Mojito 250ml', 'coctel', 5850),
 (1009, 'Cóctel JonRon Maracuyá 250ml', 'coctel', 5850),
 (1010, 'Four Loko Lulo 473ml', 'coctel', 17000),
+(1001, 'Aguardiente 260ml', 'licor', 17000),
 (1011, 'Aguardiente Antioqueño tapa roja 750ml', 'licor', 113900),
 (1012, 'Aguardiente Antioqueño tapa azul 750ml', 'licor', 113900),
 (1013, 'Ron Viejo de Caldas 750ml', 'licor', 136900),
