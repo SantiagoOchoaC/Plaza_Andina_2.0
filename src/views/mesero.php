@@ -855,9 +855,9 @@ function formatearPrecio($precio) {
 
                     <div class="feature-card" data-bs-toggle="modal" data-bs-target="#pedidosActivosModal">
                         <div class="feature-icon">📦</div>
-                        <h3 class="feature-title">Ver Pedidos</h3>
+                        <h3 class="feature-title">Mis Pedidos</h3>
                         <p class="feature-description">Ver estado de mis pedidos</p>
-                        <button class="btn-dashboard">Ver Pedidos</button>
+                        <button class="btn-dashboard">Ver Estado</button>
                     </div>
 
                     <!-- Agregar botón para abrir el modal de notificaciones en el panel de funcionalidades -->
@@ -1520,7 +1520,7 @@ function formatearPrecio($precio) {
                                     <div class="mb-3">
                                         <div class="card card-sm">
                                             <div class="card-header bg-info text-white py-1">
-                                                <small>🍹 Barra</small>
+                                                <small>🍹 Cócteles</small>
                                             </div>
                                             <div class="card-body py-2">
                                                 <div id="resumenBarra">
@@ -1669,7 +1669,7 @@ function formatearPrecio($precio) {
                 <div class="modal-body">
                     <!-- Filtros para notificaciones -->
                     <div class="row mb-3">
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-6 mb-2">
                             <input type="text" id="filtroNotiMesa" class="form-control mb-1" placeholder="Filtrar por mesa...">
                             <select id="selectNotiMesa" class="form-select form-select-sm">
                                 <option value="">Todas las mesas</option>
@@ -1684,7 +1684,7 @@ function formatearPrecio($precio) {
                                 ?>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-2">
+                        <div class="col-md-6 mb-2">
                             <input type="text" id="filtroNotiDependencia" class="form-control mb-1" placeholder="Filtrar por dependencia...">
                             <select id="selectNotiDependencia" class="form-select form-select-sm">
                                 <option value="">Todas las dependencias</option>
@@ -1695,21 +1695,6 @@ function formatearPrecio($precio) {
                                 }
                                 foreach (array_keys($deps) as $dep) {
                                     echo "<option value=\"" . htmlspecialchars($dep) . "\">" . ucfirst($dep) . "</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-2">
-                            <input type="text" id="filtroNotiPedido" class="form-control mb-1" placeholder="Filtrar por ID pedido...">
-                            <select id="selectNotiPedido" class="form-select form-select-sm">
-                                <option value="">Todos los pedidos</option>
-                                <?php
-                                $pedidos_unicos = [];
-                                foreach ($notificacionesTickets as $n) {
-                                    $pedidos_unicos[$n['pedido_id']] = true;
-                                }
-                                foreach (array_keys($pedidos_unicos) as $pid) {
-                                    echo "<option value=\"" . htmlspecialchars($pid) . "\">Pedido #$pid</option>";
                                 }
                                 ?>
                             </select>
@@ -2190,7 +2175,7 @@ function formatearPrecio($precio) {
             // Mostrar productos por categoría
             const categorias = [
                 { nombre: 'Cocina', key: 'cocina', icon: '🍽️' },
-                { nombre: 'Barra', key: 'barra', icon: '🍹' },
+                { nombre: 'Cócteles', key: 'barra', icon: '🍹' },
                 { nombre: 'Licores', key: 'licor', icon: '🥃' }
             ];
             
@@ -2407,27 +2392,21 @@ function formatearPrecio($precio) {
         function filtrarNotificaciones() {
             const filtroMesa = document.getElementById('filtroNotiMesa').value.trim().toLowerCase();
             const filtroDependencia = document.getElementById('filtroNotiDependencia').value.trim().toLowerCase();
-            const filtroPedido = document.getElementById('filtroNotiPedido').value.trim().toLowerCase();
-
             const selectMesa = document.getElementById('selectNotiMesa').value.trim().toLowerCase();
             const selectDependencia = document.getElementById('selectNotiDependencia').value.trim().toLowerCase();
-            const selectPedido = document.getElementById('selectNotiPedido').value.trim().toLowerCase();
-
+ 
             const filas = document.querySelectorAll('#tablaNotificaciones tbody tr');
             filas.forEach(fila => {
                 const mesa = fila.querySelector('.noti-mesa')?.textContent.trim().toLowerCase() || '';
                 const dependencia = fila.querySelector('.noti-dependencia')?.textContent.trim().toLowerCase() || '';
-                const pedido = fila.querySelector('.noti-pedido')?.textContent.trim().toLowerCase() || '';
 
                 let mostrar = true;
                 // Filtro manual (input)
                 if (filtroMesa && !mesa.includes(filtroMesa)) mostrar = false;
                 if (filtroDependencia && !dependencia.includes(filtroDependencia)) mostrar = false;
-                if (filtroPedido && !pedido.includes(filtroPedido)) mostrar = false;
                 // Filtro select (desplegable)
                 if (selectMesa && mesa !== selectMesa) mostrar = false;
                 if (selectDependencia && dependencia !== selectDependencia) mostrar = false;
-                if (selectPedido && pedido !== selectPedido) mostrar = false;
 
                 fila.style.display = mostrar ? '' : 'none';
             });
@@ -2435,18 +2414,12 @@ function formatearPrecio($precio) {
 
         document.getElementById('filtroNotiMesa')?.addEventListener('input', filtrarNotificaciones);
         document.getElementById('filtroNotiDependencia')?.addEventListener('input', filtrarNotificaciones);
-        document.getElementById('filtroNotiPedido')?.addEventListener('input', filtrarNotificaciones);
         document.getElementById('selectNotiMesa')?.addEventListener('change', function() {
-            // Limpiar input manual al usar select
             document.getElementById('filtroNotiMesa').value = '';
             filtrarNotificaciones();
         });
         document.getElementById('selectNotiDependencia')?.addEventListener('change', function() {
             document.getElementById('filtroNotiDependencia').value = '';
-            filtrarNotificaciones();
-        });
-        document.getElementById('selectNotiPedido')?.addEventListener('change', function() {
-            document.getElementById('filtroNotiPedido').value = '';
             filtrarNotificaciones();
         });
 
