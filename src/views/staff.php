@@ -134,7 +134,7 @@ $estadoMesas = obtenerEstadoMesas();
             <div class="dashboard-card">
                 <div class="role-header">
                     <h1 class="role-title">👮‍♂️ Staff</h1>
-                    <p class="role-subtitle">Panel de Administración General</p>
+                    <p class="role-subtitle">Seguridad y control de ingreso</p>
                 </div>
 
                 <div class="quick-stats">

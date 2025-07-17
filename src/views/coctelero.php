@@ -74,8 +74,8 @@ function mostrarPedidosPendientes() {
     if (empty($pedidos)) {
         echo '<div class="text-center">
                 <div class="alert alert-info">
-                    <h5>⏳ No hay pedidos pendientes</h5>
-                    <p>Todos los pedidos están siendo atendidos.</p>
+                    <h5>⏳ No hay tickets pendientes</h5>
+                    <p>Todos los tickets están siendo atendidos.</p>
                 </div>
               </div>';
         return;
@@ -133,8 +133,8 @@ function mostrarPedidosEnPreparacion() {
     if (empty($pedidos)) {
         echo '<div class="text-center">
                 <div class="alert alert-info">
-                    <h5>🔄 No hay pedidos en preparación</h5>
-                    <p>No hay pedidos siendo preparados en este momento.</p>
+                    <h5>🔄 No hay tickets en preparación</h5>
+                    <p>No hay tickets siendo preparados en este momento.</p>
                 </div>
               </div>';
         return;
@@ -471,7 +471,7 @@ $stats_listos = obtenerEstadisticas('listo');
 
                     <div class="feature-card">
                         <div class="feature-icon">🔄</div>
-                        <h3 class="feature-title">Marcar Pedidos</h3>
+                        <h3 class="feature-title">Marcar tickets</h3>
                         <p class="feature-description">Tickets en preparación a listos</p>
                         <a href="#" class="btn-dashboard" data-bs-toggle="modal" data-bs-target="#marcarPedidosModal">
                             Marcar Listos
@@ -497,7 +497,7 @@ $stats_listos = obtenerEstadisticas('listo');
             <div class="modal-content">
                 <div class="modal-header bg-warning text-dark">
                     <h1 class="modal-title fs-4" id="ordenAtencionModalLabel">
-                        ⏳ Pedidos Pendientes - Orden de Atención
+                        ⏳ Tickets Pendientes - Orden de Atención
                     </h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -521,7 +521,7 @@ $stats_listos = obtenerEstadisticas('listo');
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h1 class="modal-title fs-4" id="marcarPedidosModalLabel">
-                        🔄 Pedidos en Preparación - Marcar como Listos
+                        🔄 Tickets en Preparación - Marcar como Listos
                     </h1>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -545,7 +545,7 @@ $stats_listos = obtenerEstadisticas('listo');
             <div class="modal-content">
                 <div class="modal-header bg-success text-white">
                     <h1 class="modal-title fs-4" id="historialModalLabel">
-                        ✅ Pedidos Listos - Historial para Entregar
+                        ✅ Historial de tickets Listos
                     </h1>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -639,7 +639,7 @@ $stats_listos = obtenerEstadisticas('listo');
             })
             .catch(error => {
                 console.error('Error:', error);
-                contenedor.innerHTML = '<div class="alert alert-danger">Error al cargar los pedidos en preparación</div>';
+                contenedor.innerHTML = '<div class="alert alert-danger">Error al cargar los tickets en preparación</div>';
             });
     }
 

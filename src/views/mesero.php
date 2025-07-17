@@ -473,7 +473,7 @@ if (count($estados_unicos) === 1 && $estados_unicos[0] === 'entregado') {
 }
 
 
-    $_SESSION['mensaje'] = "Ticket entregado correctamente.";
+    $_SESSION['mensaje'] = "Productos del ticket entregados correctamente.";
     $_SESSION['tipo_mensaje'] = "success";
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
